@@ -44,7 +44,6 @@
 //   console.log("✅ Server running at http://localhost:3000")
 // );
 
-
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -65,12 +64,12 @@ const __dirname = path.dirname(__filename);
 // Serve static frontend files
 app.use(express.static(__dirname));
 
-// Send index.html for all other routes
-app.get("*", (req, res) => {
+// Catch-all route using regex instead of "*"
+app.get(/.*/, (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
-// Grok / OpenAI client
+// Grok API setup
 const client = new OpenAI({
   apiKey: process.env.GROQ_API_KEY,
   baseURL: "https://api.groq.com/openai/v1",
@@ -79,8 +78,7 @@ const client = new OpenAI({
 // Chat endpoint
 app.post("/chat", async (req, res) => {
   try {
-    const userMessage =
-      req.body.contents?.slice(-1)[0]?.parts?.[0]?.text || "";
+    const userMessage = req.body.contents?.slice(-1)[0]?.parts?.[0]?.text || "";
 
     const completion = await client.chat.completions.create({
       model: "llama-3.1-8b-instant",
