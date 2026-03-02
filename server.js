@@ -57,25 +57,16 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Fix __dirname for ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Serve all static files (HTML, CSS, JS)
 app.use(express.static(__dirname));
 
-// Catch-all route for frontend
-app.get(/.*/, (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
-});
-
-// Grok API client
 const client = new OpenAI({
   apiKey: process.env.GROQ_API_KEY,
   baseURL: "https://api.groq.com/openai/v1",
 });
 
-// Chat endpoint
 app.post("/chat", async (req, res) => {
   try {
     const userMessage =
@@ -87,23 +78,24 @@ app.post("/chat", async (req, res) => {
     });
 
     res.json({
-      candidates: [
-        {
-          content: {
-            parts: [
-              {
-                text: completion.choices[0].message.content,
-              },
-            ],
-          },
-        },
-      ],
+      candidates: [{
+        content: {
+          parts: [{
+            text: completion.choices[0].message.content
+          }]
+        }
+      }]
     });
+
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// Use Render PORT or 3000
+/* MUST BE LAST */
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
