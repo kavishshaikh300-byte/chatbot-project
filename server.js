@@ -69,8 +69,7 @@ const client = new OpenAI({
 
 app.post("/chat", async (req, res) => {
   try {
-    const userMessage =
-      req.body.contents?.slice(-1)[0]?.parts?.[0]?.text || "";
+    const userMessage = req.body.contents?.slice(-1)[0]?.parts?.[0]?.text || "";
 
     const completion = await client.chat.completions.create({
       model: "llama-3.1-8b-instant",
@@ -78,22 +77,24 @@ app.post("/chat", async (req, res) => {
     });
 
     res.json({
-      candidates: [{
-        content: {
-          parts: [{
-            text: completion.choices[0].message.content
-          }]
-        }
-      }]
+      candidates: [
+        {
+          content: {
+            parts: [
+              {
+                text: completion.choices[0].message.content,
+              },
+            ],
+          },
+        },
+      ],
     });
-
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-/* MUST BE LAST */
-app.get("*/", (req, res) => {
+app.get(/.*/, (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
