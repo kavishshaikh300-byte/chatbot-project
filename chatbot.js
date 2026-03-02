@@ -6,7 +6,7 @@ const fileInput = promptForm.querySelector("#file-input");
 const fileUploadWrapper = document.querySelector(".file-upload-wrapper");
 const themeToggle = document.querySelector("#theme-toggle-btn");
 
-const API_URL = "http://localhost:3000/chat";
+const API_URL = "/chat";
 
 let typingInterval, controller;
 const chatHistory = [];
@@ -135,11 +135,7 @@ const handleFormSubmit = (e) => {
       <p class="message-text">Just a sec...</p>
     `;
 
-    const botMsgDiv = createMsgElement(
-      botMsgHTML,
-      "bot-message",
-      "loading"
-    );
+    const botMsgDiv = createMsgElement(botMsgHTML, "bot-message", "loading");
 
     chatsContainer.appendChild(botMsgDiv);
     scrollToBottom();
@@ -169,7 +165,7 @@ fileInput.addEventListener("change", () => {
 
     fileUploadWrapper.classList.add(
       "active",
-      userData.file.isImage ? "img-attached" : "file-attached"
+      userData.file.isImage ? "img-attached" : "file-attached",
     );
   };
 });
@@ -204,24 +200,17 @@ document.querySelectorAll(".suggestions-item").forEach((item) => {
 themeToggle.addEventListener("click", () => {
   const isLightTheme = document.body.classList.toggle("light-theme");
 
-  localStorage.setItem(
-    "themeColor",
-    isLightTheme ? "light_mode" : "dark_mode"
-  );
+  localStorage.setItem("themeColor", isLightTheme ? "light_mode" : "dark_mode");
 
-  themeToggle.textContent =
-    isLightTheme ? "dark_mode" : "light_mode";
+  themeToggle.textContent = isLightTheme ? "dark_mode" : "light_mode";
 });
 
-const isLightTheme =
-  localStorage.getItem("themeColor") === "light_mode";
+const isLightTheme = localStorage.getItem("themeColor") === "light_mode";
 
 document.body.classList.toggle("light-theme", isLightTheme);
-themeToggle.textContent =
-  isLightTheme ? "dark_mode" : "light_mode";
+themeToggle.textContent = isLightTheme ? "dark_mode" : "light_mode";
 
 promptForm.addEventListener("submit", handleFormSubmit);
 document
   .querySelector("#add-file-btn")
   .addEventListener("click", () => fileInput.click());
-
