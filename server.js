@@ -93,7 +93,7 @@ app.post("/chat", async (req, res) => {
 });
 
 /* MUST BE LAST */
-app.get("*", (req, res) => {
+app.get("*/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
