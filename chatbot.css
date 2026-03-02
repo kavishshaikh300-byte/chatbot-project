@@ -356,5 +356,119 @@ body.bot-responding .prompt-form #stop-response-btn {
   to{transform:rotate(360deg);}
 }
 
+/* ===== UNIVERSAL RESPONSIVE FIX ===== */
+
+.container{
+width:100%;
+max-width:1100px;
+margin:auto;
+}
+
+/* Text auto scales */
+.heading{
+font-size:clamp(28px,5vw,48px);
+}
+
+.sub-heading{
+font-size:clamp(18px,3vw,32px);
+}
+
+/* Chat height adapts to screen */
+.container{
+max-height:calc(100vh - 110px);
+}
+
+/* Suggestions wrap nicely */
+.suggestions{
+flex-wrap:nowrap;
+overflow-x:auto;
+scroll-behavior:smooth;
+}
+
+/* Input always fits screen */
+.prompt-form{
+width:100%;
+}
+
+/* ===== TABLET ===== */
+@media (max-width:900px){
+
+.container{
+padding:20px 10px 90px;
+}
+
+.suggestions{
+gap:10px;
+}
+
+.suggestions .suggestions-item{
+width:200px;
+}
+
+.chats-container .user-message .message-text{
+max-width:85%;
+}
+
+}
+
+/* ===== MOBILE ===== */
+@media (max-width:600px){
+
+.container{
+padding:15px 8px 110px;
+}
+
+.app-header{
+text-align:center;
+margin-top:20px;
+}
+
+.suggestions{
+margin-top:30px;
+}
+
+.suggestions .suggestions-item{
+width:85%;
+}
+
+.chats-container{
+gap:14px;
+}
+
+.chats-container .user-message .message-text{
+max-width:92%;
+font-size:15px;
+}
+
+.prompt-container{
+padding:10px 8px;
+}
+
+.prompt-wrapper{
+display:flex !important;
+flex-wrap:nowrap;
+}
+
+.prompt-wrapper button{
+width:48px;
+height:48px;
+font-size:1.2rem;
+}
+
+}
+
+/* ===== LARGE SCREENS ===== */
+@media (min-width:1400px){
+
+.container{
+max-width:1300px;
+}
+
+.chats-container{
+gap:24px;
+}
+
+}
+
 
 

@@ -61,15 +61,15 @@ app.use(express.json());
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Serve static frontend files
+// Serve all static files (HTML, CSS, JS)
 app.use(express.static(__dirname));
 
-// Catch-all route using regex instead of "*"
+// Catch-all route for frontend
 app.get(/.*/, (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
-// Grok API setup
+// Grok API client
 const client = new OpenAI({
   apiKey: process.env.GROQ_API_KEY,
   baseURL: "https://api.groq.com/openai/v1",
@@ -78,7 +78,8 @@ const client = new OpenAI({
 // Chat endpoint
 app.post("/chat", async (req, res) => {
   try {
-    const userMessage = req.body.contents?.slice(-1)[0]?.parts?.[0]?.text || "";
+    const userMessage =
+      req.body.contents?.slice(-1)[0]?.parts?.[0]?.text || "";
 
     const completion = await client.chat.completions.create({
       model: "llama-3.1-8b-instant",
@@ -103,8 +104,6 @@ app.post("/chat", async (req, res) => {
   }
 });
 
-// Use Render PORT or default 3000
+// Use Render PORT or 3000
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`✅ Server running at http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
