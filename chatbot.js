@@ -22,22 +22,68 @@ const createMsgElement = (content, ...className) => {
 const scrollToBottom = () =>
   container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
 
+// const typingEffect = (text, textElement, botMsgDiv) => {
+//   textElement.textContent = "";
+//   const words = text.split(" ");
+//   let wordIndex = 0;
+
+//   typingInterval = setInterval(() => {
+//     if (wordIndex < words.length) {
+//       textElement.textContent +=
+//         (wordIndex === 0 ? "" : " ") + words[wordIndex++];
+//       scrollToBottom();
+//     } else {
+//       clearInterval(typingInterval);
+//       botMsgDiv.classList.remove("loading");
+//       document.body.classList.remove("bot-responding");
+//     }
+//   }, 40);
+// };
+
+function addCopyButtons() {
+  document.querySelectorAll("pre").forEach((block) => {
+    if (block.querySelector(".copy-btn")) return;
+
+    const button = document.createElement("button");
+    button.innerText = "Copy";
+    button.className = "copy-btn";
+
+    button.onclick = () => {
+      const code = block.innerText;
+      navigator.clipboard.writeText(code);
+      button.innerText = "Copied!";
+      setTimeout(() => (button.innerText = "Copy"), 2000);
+    };
+
+    block.appendChild(button);
+  });
+}
+
 const typingEffect = (text, textElement, botMsgDiv) => {
-  textElement.textContent = "";
-  const words = text.split(" ");
-  let wordIndex = 0;
+  let index = 0;
+  let tempText = "";
 
   typingInterval = setInterval(() => {
-    if (wordIndex < words.length) {
-      textElement.textContent +=
-        (wordIndex === 0 ? "" : " ") + words[wordIndex++];
+    if (index < text.length) {
+      tempText += text[index++];
+
+      // ✅ Convert markdown → HTML
+      textElement.innerHTML = marked.parse(tempText);
+
+      // ✅ Highlight code blocks
+      document.querySelectorAll("pre code").forEach((block) => {
+        hljs.highlightElement(block);
+      });
+
+      addCopyButtons(); // optional but nice
+
       scrollToBottom();
     } else {
       clearInterval(typingInterval);
       botMsgDiv.classList.remove("loading");
       document.body.classList.remove("bot-responding");
     }
-  }, 40);
+  }, 30);
 };
 
 const generateResponse = async (botMsgDiv) => {
@@ -73,7 +119,7 @@ const generateResponse = async (botMsgDiv) => {
 
     const responseText =
       data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "⚠️ No response received from AI.";
+      " No response received from AI.";
 
     chatHistory.push({
       role: "model",

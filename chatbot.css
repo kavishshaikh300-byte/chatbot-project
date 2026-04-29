@@ -161,7 +161,6 @@ body.chats-active .container :where(.app-header, .suggestions) {
 .chats-container .message .message-text{
     padding: 3px 16px;
     word-wrap: break-word;
-    white-space: pre-line;
 }
 
 .chats-container .bot-message{
@@ -356,7 +355,7 @@ body.bot-responding .prompt-form #stop-response-btn {
   to{transform:rotate(360deg);}
 }
 
-/* ===== UNIVERSAL RESPONSIVE FIX ===== */
+
 
 .container{
 width:100%;
@@ -364,7 +363,7 @@ max-width:1100px;
 margin:auto;
 }
 
-/* Text auto scales */
+
 .heading{
 font-size:clamp(28px,5vw,48px);
 }
@@ -373,24 +372,24 @@ font-size:clamp(28px,5vw,48px);
 font-size:clamp(18px,3vw,32px);
 }
 
-/* Chat height adapts to screen */
+
 .container{
 max-height:calc(100vh - 110px);
 }
 
-/* Suggestions wrap nicely */
+
 .suggestions{
 flex-wrap:nowrap;
 overflow-x:auto;
 scroll-behavior:smooth;
 }
 
-/* Input always fits screen */
+
 .prompt-form{
 width:100%;
 }
 
-/* ===== TABLET ===== */
+
 @media (max-width:900px){
 
 .container{
@@ -411,7 +410,7 @@ max-width:85%;
 
 }
 
-/* ===== MOBILE ===== */
+
 @media (max-width:600px){
 
 .container{
@@ -457,7 +456,7 @@ font-size:1.2rem;
 
 }
 
-/* ===== LARGE SCREENS ===== */
+
 @media (min-width:1400px){
 
 .container{
