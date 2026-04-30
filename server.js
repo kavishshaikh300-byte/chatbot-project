@@ -28,14 +28,13 @@ app.post("/chat", async (req, res) => {
 
     const completion = await client.chat.completions.create({
       model: "llama-3.1-8b-instant",
-      stream: true,
       messages: [
         {
           role: "system",
           content: `
 You are a helpful AI assistant.
 - Give clear answers
-- Always format properly
+- Use proper formatting
 - Use markdown for code
 - End with ONE follow-up question
 `
@@ -47,16 +46,21 @@ You are a helpful AI assistant.
       ],
     });
 
-    res.setHeader("Content-Type", "text/plain");
-
-    for await (const chunk of completion) {
-      const text = chunk.choices[0]?.delta?.content || "";
-      res.write(text);
-    }
-
-    res.end();
+    res.json({
+      candidates: [
+        {
+          content: {
+            parts: [
+              {
+                text: completion.choices[0].message.content,
+              },
+            ],
+          },
+        },
+      ],
+    });
   } catch (error) {
-    res.status(500).send(error.message);
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -64,7 +68,5 @@ app.get(/.*/, (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
-
-
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on ${PORT}`));
