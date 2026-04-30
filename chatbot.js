@@ -8,7 +8,7 @@ const themeToggle = document.querySelector("#theme-toggle-btn");
 
 const API_URL = "/chat";
 
-let typingInterval, controller;
+let controller;
 const chatHistory = [];
 const userData = { message: "", file: {} };
 
@@ -21,24 +21,6 @@ const createMsgElement = (content, ...className) => {
 
 const scrollToBottom = () =>
   container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
-
-// const typingEffect = (text, textElement, botMsgDiv) => {
-//   textElement.textContent = "";
-//   const words = text.split(" ");
-//   let wordIndex = 0;
-
-//   typingInterval = setInterval(() => {
-//     if (wordIndex < words.length) {
-//       textElement.textContent +=
-//         (wordIndex === 0 ? "" : " ") + words[wordIndex++];
-//       scrollToBottom();
-//     } else {
-//       clearInterval(typingInterval);
-//       botMsgDiv.classList.remove("loading");
-//       document.body.classList.remove("bot-responding");
-//     }
-//   }, 40);
-// };
 
 function addCopyButtons() {
   document.querySelectorAll("pre").forEach((block) => {
@@ -59,35 +41,9 @@ function addCopyButtons() {
   });
 }
 
-const typingEffect = (text, textElement, botMsgDiv) => {
-  let index = 0;
-  let tempText = "";
-
-  typingInterval = setInterval(() => {
-    if (index < text.length) {
-      tempText += text[index++];
-
-      // ✅ Convert markdown → HTML
-      textElement.innerHTML = marked.parse(tempText);
-
-      // ✅ Highlight code blocks
-      document.querySelectorAll("pre code").forEach((block) => {
-        hljs.highlightElement(block);
-      });
-
-      addCopyButtons(); // optional but nice
-
-      scrollToBottom();
-    } else {
-      clearInterval(typingInterval);
-      botMsgDiv.classList.remove("loading");
-      document.body.classList.remove("bot-responding");
-    }
-  }, 30);
-};
-
 const generateResponse = async (botMsgDiv) => {
   const textElement = botMsgDiv.querySelector(".message-text");
+
   controller = new AbortController();
 
   const userParts = [{ text: userData.message }];
@@ -114,24 +70,43 @@ const generateResponse = async (botMsgDiv) => {
       signal: controller.signal,
     });
 
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error?.message || "Server error");
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder("utf-8");
 
-    const responseText =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-      " No response received from AI.";
+    let fullText = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      const chunk = decoder.decode(value);
+      fullText += chunk;
+
+      textElement.textContent = fullText;
+      scrollToBottom();
+    }
 
     chatHistory.push({
       role: "model",
-      parts: [{ text: responseText }],
+      parts: [{ text: fullText }],
     });
 
-    typingEffect(responseText, textElement, botMsgDiv);
+    textElement.innerHTML = marked.parse(fullText);
+
+    document.querySelectorAll("pre code").forEach((block) => {
+      hljs.highlightElement(block);
+    });
+
+    addCopyButtons();
+
+    botMsgDiv.classList.remove("loading");
+    document.body.classList.remove("bot-responding");
+
   } catch (error) {
     textElement.style.color = "#d62939";
     textElement.textContent =
       error.name === "AbortError"
-        ? "Response generation stopped."
+        ? "Response stopped."
         : error.message;
 
     botMsgDiv.classList.remove("loading");
@@ -178,7 +153,7 @@ const handleFormSubmit = (e) => {
   setTimeout(() => {
     const botMsgHTML = `
       <img src="ntr.png" class="avatar">
-      <p class="message-text">Just a sec...</p>
+      <p class="message-text"></p>
     `;
 
     const botMsgDiv = createMsgElement(botMsgHTML, "bot-message", "loading");
@@ -187,7 +162,7 @@ const handleFormSubmit = (e) => {
     scrollToBottom();
 
     generateResponse(botMsgDiv);
-  }, 600);
+  }, 400);
 };
 
 fileInput.addEventListener("change", () => {
@@ -211,7 +186,7 @@ fileInput.addEventListener("change", () => {
 
     fileUploadWrapper.classList.add(
       "active",
-      userData.file.isImage ? "img-attached" : "file-attached",
+      userData.file.isImage ? "img-attached" : "file-attached"
     );
   };
 });
@@ -223,10 +198,6 @@ document.querySelector("#cancel-file-btn").addEventListener("click", () => {
 
 document.querySelector("#stop-response-btn").addEventListener("click", () => {
   controller?.abort();
-  clearInterval(typingInterval);
-  chatsContainer
-    .querySelector(".bot-message.loading")
-    ?.classList.remove("loading");
   document.body.classList.remove("bot-responding");
 });
 
@@ -245,9 +216,7 @@ document.querySelectorAll(".suggestions-item").forEach((item) => {
 
 themeToggle.addEventListener("click", () => {
   const isLightTheme = document.body.classList.toggle("light-theme");
-
   localStorage.setItem("themeColor", isLightTheme ? "light_mode" : "dark_mode");
-
   themeToggle.textContent = isLightTheme ? "dark_mode" : "light_mode";
 });
 
