@@ -155,3 +155,69 @@ promptForm.addEventListener("submit", handleFormSubmit);
 document
   .querySelector("#add-file-btn")
   .addEventListener("click", () => fileInput.click());
+
+fileInput.addEventListener("change", () => {
+  const file = fileInput.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+
+  reader.onload = (e) => {
+    fileInput.value = "";
+
+    const base64String = e.target.result.split(",")[1];
+
+    userData.file = {
+      fileName: file.name,
+      data: base64String,
+      mime_type: file.type,
+      isImage: file.type.startsWith("image/"),
+    };
+
+    fileUploadWrapper.classList.add(
+      "active",
+      userData.file.isImage ? "img-attached" : "file-attached"
+    );
+  };
+});
+
+document.querySelector("#cancel-file-btn").addEventListener("click", () => {
+  userData.file = {};
+  fileUploadWrapper.classList.remove("active", "img-attached", "file-attached");
+});
+
+document.querySelector("#stop-response-btn").addEventListener("click", () => {
+  clearInterval(typingInterval);
+  document.body.classList.remove("bot-responding");
+});
+
+document.querySelector("#delete-chat-btn").addEventListener("click", () => {
+  chatHistory.length = 0;
+  chatsContainer.innerHTML = "";
+  document.body.classList.remove("bot-responding", "chats-active");
+});
+
+document.querySelectorAll(".suggestions-item").forEach((item) => {
+  item.addEventListener("click", () => {
+    promptInput.value = item.querySelector(".text").textContent;
+    promptForm.dispatchEvent(new Event("submit"));
+  });
+});
+
+themeToggle.addEventListener("click", () => {
+  const isLightTheme = document.body.classList.toggle("light-theme");
+
+  localStorage.setItem("themeColor", isLightTheme ? "light_mode" : "dark_mode");
+
+  themeToggle.textContent = isLightTheme ? "dark_mode" : "light_mode";
+});
+
+const isLightTheme = localStorage.getItem("themeColor") === "light_mode";
+
+document.body.classList.toggle("light-theme", isLightTheme);
+themeToggle.textContent = isLightTheme ? "dark_mode" : "light_mode";
+
+document
+  .querySelector("#add-file-btn")
+  .addEventListener("click", () => fileInput.click());
