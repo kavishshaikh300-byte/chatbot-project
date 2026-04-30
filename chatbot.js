@@ -41,12 +41,15 @@ function addCopyButtons() {
 }
 
 const typingEffect = (text, textElement, botMsgDiv) => {
-  textElement.textContent = "";
   let index = 0;
+  let buffer = "";
 
   typingInterval = setInterval(() => {
     if (index < text.length) {
-      textElement.textContent += text[index++];
+      buffer += text[index++];
+
+      textElement.innerText = buffer.replace(/[*_`#>-]/g, "");
+
       scrollToBottom();
     } else {
       clearInterval(typingInterval);
@@ -62,7 +65,7 @@ const typingEffect = (text, textElement, botMsgDiv) => {
       botMsgDiv.classList.remove("loading");
       document.body.classList.remove("bot-responding");
     }
-  }, 10);
+  }, 12);
 };
 
 const generateResponse = async (botMsgDiv) => {
